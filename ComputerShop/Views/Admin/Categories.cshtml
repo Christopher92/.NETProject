@@ -1,0 +1,215 @@
+﻿@model IEnumerable<ComputerShop.Models.Category>
+<div id="test">
+    @{
+        ViewBag.Title = "Kategorie";
+    }
+
+    <h2>@ViewBag.Title</h2>
+    <hr />
+    @if (this.User.IsInRole("Administrator"))
+    {
+        <p>
+            @{var add = "<span class=' glyphicon glyphicon-plus'></span>";
+            }
+            <a class="btn btn-success" data-ajax="true" data-ajax-method="GET" data-ajax-mode="replace" data-ajax-update="#main" href="/Categories/Create">@Html.Raw(add)</a>
+        </p>
+                }
+    <table id="example" class="stripe">
+        <thead>
+            <tr>
+                <th>
+                    Lp.
+                </th>
+                <th>
+                    Kategoria nadrzędna
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Description)
+                </th>
+                <th>
+                    Dostępność
+                </th>
+                @if (this.User.IsInRole("Administrator"))
+                {
+                    <th>Akcja</th>
+                }
+            </tr>
+        </thead>
+        @{ int i = 1;
+            string isParent = "";}
+        <tbody>
+            @foreach (var item in Model)
+            {
+
+                var activate = "";
+                var button = "";
+                var text = "";
+
+                if (item.Enable == true)
+                {
+                    activate = "Dezaktywuj";
+                    button = "btn-danger";
+                    text = "Tak";
+                }
+                else
+                {
+                    activate = "Aktywuj";
+                    button = "btn-success";
+                    text = "Nie";
+                }
+
+                <tr>
+                    <td>
+                        @i
+                    </td>
+                    <td>
+
+                        @{if (Html.DisplayFor(modelItem => item.ParentCategory.Name).ToString() == "")
+                            {
+                                isParent = "-";
+                            }
+                            else
+                            {
+                                isParent = @Html.DisplayFor(modelItem => item.ParentCategory.Name).ToString();
+                            }
+                        @isParent
+                        }
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @text
+                    </td>
+                    @if (this.User.IsInRole("Administrator"))
+                    {
+                        <td>
+                            @{var edit = "<span class=' glyphicon glyphicon-edit'></span>";
+                                var switchbutton = "";
+                                var btncolor = "";
+
+                                if (@activate == "Dezaktywuj")
+                                {
+                                    switchbutton = "<span class=' glyphicon glyphicon-off'></span>";
+                                    btncolor = "btn-danger";
+                                }
+                                else if (@activate == "Aktywuj")
+                                {
+                                    switchbutton = "<span class=' glyphicon glyphicon-off'></span>";
+                                    btncolor = "btn-success";
+                                }
+                            }
+                            @*@Ajax.ActionLink("Edytuj", "Edit", "Categories", new { id = item.CategoryID }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "main" }, new { @class = "btn btn-success" })*@
+                            <a class="btn btn-success" data-ajax="true" data-ajax-method="GET" data-ajax-mode="replace" data-ajax-update="#main" href="/Categories/Edit/@item.CategoryID">@Html.Raw(@edit)</a>
+                            @*@Ajax.ActionLink(@activate, "Activate", "Categories", new { id = item.CategoryID }, new AjaxOptions { HttpMethod = "GET", OnSuccess = "success()" }, new { @class = "btn " + @button })*@
+                            <a class="btn @btncolor" data-ajax="true" data-ajax-method="GET" data-ajax-success="success()" href="/Categories/Activate/1">@Html.Raw(@switchbutton)</a>
+                        </td>
+                                }
+                </tr>
+                                    i++;
+
+                                }
+        </tbody>
+    </table>
+</div>
+<link href="@Url.Content("~/Content/jquery.dataTables.min.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery.dataTables.min.js")"></script>
+
+<script>
+    function success() {
+        $("#test").load(location.href + "/GetCategories #test");
+    }
+
+    function successModal() {
+        $("#test").load(location.href + "/GetCategories #test");
+        $("#closeButton").click();
+
+    }
+
+    $(document).ajaxComplete(function () {
+        var table = $('#example').DataTable();
+        table.destroy();
+        $('#example').DataTable({
+            "order": [[0, "asc"]],
+            "language": {
+                "lengthMenu": "Wyświetl _MENU_ rekordów na stronę",
+                "zeroRecords": "Brak rekordów",
+                "info": "Strona _PAGE_ z _PAGES_",
+                "infoEmpty": "Rekordy są niedostępne",
+                "infoFiltered": "(przefiltrowano z _MAX_ total records)",
+                "search": "Szukaj",
+                "paginate": {
+                    "previous": "Poprzednia",
+                    "next": "Następna",
+                },
+            },
+            "columnDefs": [
+{
+    "targets": [3],
+    "visible": false
+}
+            ],
+            //            "columns": [
+            //{ "width": "2%" },
+            //{ "width": "20%" },
+            //{ "width": "20%" },
+            //null,
+            //{ "width": "10%" },
+            //{ "width": "10%" },
+
+
+            //            ],
+        });
+    });
+
+    $(document).ready(function () {
+        $('#example').DataTable({
+            "order": [[0, "asc"]],
+            "language": {
+                "lengthMenu": "Wyświetl _MENU_ rekordów na stronę",
+                "zeroRecords": "Brak rekordów",
+                "info": "Strona _PAGE_ z _PAGES_",
+                "infoEmpty": "Rekordy są niedostępne",
+                "infoFiltered": "(przefiltrowano z _MAX_ total records)",
+                "search": "Szukaj",
+                "paginate": {
+                    "previous": "Poprzednia",
+                    "next": "Następna",
+                },
+            },
+            "columnDefs": [
+{
+    "targets": [3],
+    "visible": false
+}
+            ],
+            //            "columns": [
+            //{ "width": "2%" },
+            //{ "width": "20%" },
+            //{ "width": "20%" },
+            //null,
+            //{ "width": "10%" },
+            //{ "width": "10%" },
+
+
+            //            ],
+
+
+        });
+    });
+    $(window).unload(function () {
+        console.log("help");
+        table.destroy();
+        console.log(table);
+    });
+</script>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

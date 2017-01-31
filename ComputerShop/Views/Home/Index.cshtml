@@ -1,0 +1,125 @@
+﻿@model IEnumerable<ComputerShop.Models.Category>
+@using Microsoft.AspNet.Identity
+
+@{
+    ViewBag.Title = "Widok";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Sklep komputerowy</title>
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/bootstrap")
+    <script src="//fast.eager.io/tnzEMbAz06.js"></script>
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/metisMenu")
+    @Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.min.js")
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link href="@Url.Content("~/Content/sb-admin-2.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/jquery.dataTables.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/font-awesome.min.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/jquery.dataTables.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/nprogress.js")"></script>
+    <link href="@Url.Content("~/Content/nprogress.css")" rel="stylesheet" type="text/css" />
+
+</head>
+<body>
+    <div id="Page">
+        <div class="navbar navbar-inverse navbar-fixed-top animated-header">
+            <div class="paddings">
+                <div class="simple-nav-justified">
+                    <ul class="nav nav-pills nav-justified">
+                        <li>@Ajax.ActionLink("Strona główna", "IndexForAjax", "Home", null, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "Main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })</li>
+                        <li>@Ajax.ActionLink("Kategorie produktów", "Menu", "Categories", null, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "Main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })</li>
+                        @if (this.User.IsInRole("Klient"))
+                        {
+                            <li>@Ajax.ActionLink("Koszyk", "Index", "OrderProducts", null, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "Main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })</li>
+                        }
+                        <li>@Ajax.ActionLink("Regulamin", "Regulation", "Regulations", null, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "Main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })</li>
+                        <li>@Ajax.ActionLink("Kontakt", "Contact", "Contacts", null, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "Main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })</li>
+                        @Html.Partial("_LoginPartial")
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container body-content">
+            <!-- search button -->
+            <br>
+
+            @*@using (Html.BeginForm())*@
+            @using (@Ajax.BeginForm("Search", "Categories", null, new AjaxOptions { HttpMethod = "POST", InsertionMode = InsertionMode.Replace, UpdateTargetId = "Main" }))
+            {
+                <div id="custom-search-input" class="col-md-offset-4 col-md-4">
+                    <div class="input-group">
+                        @*<input type="text" class="search-query form-control" placeholder="Szukaj produktów" />*@
+                        @Html.TextBox("SearchString", null, new { @class = "search-query form-control", @placeholder = "Szukaj produktów", @style="max-width: 320px !important"})
+
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="submit">
+                                <span class=" glyphicon glyphicon-search"></span>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            }
+            @*<div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Create" class="btn btn-primary" />
+                </div>*@
+
+            <div id="Main">
+                <div class="row" id="row">
+                    <div class="col-lg-12">
+                        <h1 class="page-header">Strona główna</h1>
+                    </div>
+                    @{int i = 0;}
+                    @foreach (var category in Model.Where(x => i < 12))
+                    {
+                        <div class="col-lg-3 col-md-4 col-xs-6 thumb">
+                            <a data-ajax="true" data-ajax-method="GET" data-ajax-mode="replace" data-ajax-update="#Main" href="/Categories/Menu/@category.CategoryID">
+                                <img data-src="holder.js/100%x200" alt="100%x200" style="height: 200px; width: 100%; " src=@Html.DisplayFor(model => category.Products.FirstOrDefault().ProductPicture.Path) data-holder-rendered="true">
+                            </a>
+
+                            <center>@Ajax.ActionLink(@Html.DisplayFor(x => category.Name).ToString().Replace("&#243;","ó"), "Menu", "Categories", new { id = category.CategoryID }, new AjaxOptions { HttpMethod = "GET", UpdateTargetId = "Main", InsertionMode = InsertionMode.Replace })</center>
+                        </div>
+                        i++;
+                    }
+                </div>
+            </div>
+            <div id="footer">
+                <hr />
+                <footer>
+                    <br>
+                    <center><p>&copy; @DateTime.Now.Year - Sklep komputerowy - Krzysztof Królikowski</p></center>
+                    <br>
+                </footer>
+            </div>
+        </div>
+    </div>
+    @Scripts.Render("~/bundles/bootstrap")
+    @*@RenderSection("scripts", required: false)*@
+</body>
+</html>
+
+
+<script>
+    $(document).ready(function () {
+        NProgress.start();
+    });
+
+    $(window).load(function () {
+        NProgress.done();
+    });
+    $(window).ajaxStart(function () {
+        NProgress.start();
+    });
+
+    $(window).ajaxComplete(function () {
+        NProgress.done();
+    });
+</script>

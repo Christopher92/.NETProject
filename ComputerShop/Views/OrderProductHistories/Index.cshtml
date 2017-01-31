@@ -1,0 +1,167 @@
+﻿@model IEnumerable<ComputerShop.Models.OrderProductHistory>
+
+@{
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">
+            Historia zamówień
+        </h1>
+        <h4>Klient: @ViewBag.UserId </h4>
+    </div>
+</div>
+
+<table id="example" class="stripe">
+    <thead>
+
+        <tr>
+            <th>
+                Lp.
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderProduct.Product.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderProduct.Quantity)
+            </th>
+            <th>
+                Suma
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderProduct.Order.IncomingDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderProduct.Order.OutcomingDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderProduct.Order.OrderSupply.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderProduct.Order.OrderPayment.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderProduct.Order.OrderState.Name)
+            </th>
+        </tr>
+    </thead>
+    @{ int i = 1;}
+
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @i
+                </td>
+                <td>
+                    @Html.DisplayFor(model => item.OrderProduct.Product.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <th>
+                    @Html.DisplayFor(modelItem => item.OrderProduct.Quantity)
+                </th>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OrderProduct.Suma)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => item.OrderProduct.Order.IncomingDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => item.OrderProduct.Order.OutcomingDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => item.OrderProduct.Order.OrderSupply.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => item.OrderProduct.Order.OrderPayment.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => item.OrderProduct.Order.OrderState.Name)
+                </td>
+            </tr>
+                            i++;
+                        }
+    </tbody>
+</table>
+
+<div>
+    @Ajax.ActionLink("Powrót", "IndexForAjax", "Admin", null, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })
+</div>
+
+<link href="@Url.Content("~/Content/jquery.dataTables.min.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery.dataTables.min.js")"></script>
+
+<script>
+    //var dataTable = $("#myTable").dataTable({"order": [[1,"asc"]]});
+
+    function success() {
+        $("#test").load(location.href+ " #test");
+        //dataTable.draw;
+
+    }
+
+    function successModal() {
+        $("#test").load(location.href + "OrderProducts/IndexForAjax #test");
+        $("#closeButton").click();
+
+    }
+
+    $(document).ajaxComplete(function () {
+        var table = $('#example').DataTable();
+        table.destroy();
+        $('#example').DataTable({
+            "order": [[0, "asc"]],
+            "language": {
+                "lengthMenu": "Wyświetl _MENU_ rekordów na stronę",
+                "zeroRecords": "Brak rekordów",
+                "info": "Strona _PAGE_ z _PAGES_",
+                "infoEmpty": "Rekordy są niedostępne",
+                "infoFiltered": "(przefiltrowano z _MAX_ total records)",
+                "search": "Szukaj"
+            },
+            dom: 'Bfrtip',
+            buttons: [
+                'copyHtml5',
+                'excelHtml5',
+                'csvHtml5',
+                'pdfHtml5'
+            ]
+        });
+    });
+
+    $(document).ready(function () {
+        $('#example').DataTable({
+            "order": [[0, "asc"]],
+            "language": {
+                "lengthMenu": "Wyświetl _MENU_ rekordów na stronę",
+                "zeroRecords": "Brak rekordów",
+                "info": "Strona _PAGE_ z _PAGES_",
+                "infoEmpty": "Rekordy są niedostępne",
+                "infoFiltered": "(przefiltrowano z _MAX_ total records)",
+                "search": "Szukaj"
+            },dom: 'Bfrtip',
+        buttons: [
+            'copyHtml5',
+            'excelHtml5',
+            'csvHtml5',
+            'pdfHtml5'
+        ]
+        });
+    });
+    $(window).unload(function () {
+        console.log("help");
+        table.destroy();
+        console.log(table);
+    });
+</script>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

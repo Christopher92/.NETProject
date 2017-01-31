@@ -1,0 +1,40 @@
+﻿@model PagedList.IPagedList<ComputerShop.Models.Article>
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+@{
+    ViewBag.Title = "Article";
+    Layout = null;
+
+}
+<div id="x">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">
+                Artykuły
+            </h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="media">
+                @foreach (var item in Model)
+                {
+                    <div class="media-body">
+                        <h4 class="media-heading">
+                            @Ajax.ActionLink(@Html.DisplayFor(x => item.Title).ToString(),"RetrieveArticle","Articles",new { id = item.ArticleID},new AjaxOptions { HttpMethod="POST",InsertionMode=InsertionMode.Replace, UpdateTargetId="x"})
+                        </h4>
+                        <p>@Html.DisplayFor(x => item.ShortContent)</p>
+                        <h4>Autor: @Html.DisplayFor(x => item.Author)</h4>
+                    </div>
+                    <hr>
+                }
+
+            </div>
+        </div>
+    </div>
+
+    Strona @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) z @Model.PageCount
+
+    @Html.PagedListPager(Model, page => Url.Action("Article", new { page }), PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "POST", UpdateTargetId = "x", InsertionMode = InsertionMode.Replace }))
+</div>

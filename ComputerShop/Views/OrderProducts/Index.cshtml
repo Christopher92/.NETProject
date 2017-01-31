@@ -1,0 +1,316 @@
+﻿@model Tuple<List<ComputerShop.Models.OrderProduct>,ComputerShop.Models.ApplicationUser>
+@using Microsoft.AspNet.Identity;
+<div id="test">
+
+    @{
+        ViewBag.Title = "Index";
+    }
+
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">
+                Koszyk
+            </h1>
+        </div>
+    </div>
+
+    <table id="example" class="table-condensed table-responsive">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Item1.First().Product.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Item1.First().Product.Price)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Item1.First().Quantity)
+                </th>
+                <th>
+                    Suma
+                </th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        @{float sum = 0;
+            int numberOfProducts = 0; }
+        <tbody>
+            @foreach (var item in Model.Item1)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Product.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Product.Price)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Quantity)
+                    </td>
+                    <td>
+                        @{
+                            var result = item.Quantity * item.Product.Price;
+                            sum += result;
+                            numberOfProducts += item.Quantity;
+                            @result
+                        } zł
+                    </td>
+                    <td>
+                        @*@Html.ActionLink("+", "AddOneProductToCart", new { id = item.OrderProductID })*@
+                        <a data-ajax="true" class="btn btn-primary" role="button" data-ajax-success="success" href="/OrderProducts/AddOneProductToCart/@item.Product.ProductID">+</a>
+                        <a data-ajax="true" class="btn btn-success" role="button" data-ajax-success="success" href="/OrderProducts/RemoveOneProductFromCart/@item.OrderProductID">-</a>
+                        <a data-ajax="true" class="btn btn-danger" role="button" data-ajax-success="success" href="/OrderProducts/RemoveEntireProductFromCart/@item.OrderProductID">x</a>
+
+                    </td>
+                </tr>
+                            }
+        </tbody>
+
+    </table>
+    @if (Model.Item1.FirstOrDefault() != null)
+    {
+
+        <div class="col-md-6">
+        </div>
+        <div class="col-md-6">
+            Suma: @sum
+        </div>
+        @Ajax.ActionLink("Usuń wszystkie", "RemoveAllProductsFromCart", null, new AjaxOptions() { OnSuccess = "success()" }, new { @class = "btn btn-primary" })
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Zrealizuj</button>
+    }
+
+    <div id="myModal" class="modal fade bs-example-modal-lg" role="dialog" aria-labelledby="myLargeModalLabel" tabindex="-1">
+        <div class="modal-dialog modal-lg" style="width: 980px;">
+
+            <!-- Modal content-->
+            <div class="modal-content modal-window">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" id="closeButton">&times;</button>
+                    <h4 class="modal-title">Realizacja zakupów</h4>
+                </div>
+                <div class="col-md-4"><b>Liczba produktów: @numberOfProducts</b></div><br>
+                <div class="col-md-4"><b>Do zapłaty: @sum zł</b></div><br>
+                <div id="formularz">
+                    @using (Ajax.BeginForm("Realize", "OrderProducts", new AjaxOptions { OnSuccess = "successModal()", HttpMethod = "POST", InsertionMode = InsertionMode.Replace, UpdateTargetId = "formularz" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="modal-body">
+
+
+
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Item1.First().Order.OrderPayment.Name, null, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        @Html.DropDownListFor(n => n.Item1.First().Order.OrderPaymentID, (IEnumerable<SelectListItem>)ViewData["OrderPaymentID"], String.Empty, htmlAttributes: new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.Item1.First().Order.OrderPaymentID, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Item1.First().Order.OrderSupply.Name, null, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        @Html.DropDownListFor(n => n.Item1.First().Order.OrderSupplyID, (IEnumerable<SelectListItem>)ViewData["OrderSupplyID"], String.Empty, htmlAttributes: new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.Item1.First().Order.OrderSupplyID, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="col-md-12">
+                                    <div class="col-md-offset-2 col-md-4">Dane użytkownika</div>
+                                    <div class="col-md-offset-3 col-md-3">Dane wysyłkowe</div>
+                                </div>
+                                <br>
+                                <div class="form-group">
+
+                                    @Html.LabelFor(model => model.Item2.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-4">
+                                        @Html.TextBoxFor(model => model.Item2.Name, new { @class = "form-control", @disabled = "true" })
+                                        @Html.ValidationMessageFor(model => model.Item2.Name, "", new { @class = "text-danger" })
+                                    </div>
+                                    @Html.LabelFor(model => model.Item1.First().Order.OrderUser.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-4">
+                                        @Html.TextBoxFor(model => model.Item1.FirstOrDefault().Order.OrderUser.Name, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.Item1.First().Order.OrderUser.Name, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Item2.Surname, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-4">
+                                        @Html.TextBoxFor(model => model.Item2.Surname, new { @class = "form-control", @disabled = "true" })
+                                        @Html.ValidationMessageFor(model => model.Item2.Surname, "", new { @class = "text-danger" })
+                                    </div>
+                                    @Html.LabelFor(model => model.Item1.First().Order.OrderUser.Surname, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-4">
+                                        @Html.TextBoxFor(model => model.Item1.FirstOrDefault().Order.OrderUser.Surname, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.Item1.First().Order.OrderUser.Surname, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Item2.Address, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-4">
+                                        @Html.TextBoxFor(model => model.Item2.Address, new { @class = "form-control", @disabled = "true" })
+                                        @Html.ValidationMessageFor(model => model.Item2.Address, "", new { @class = "text-danger" })
+                                    </div>
+                                    @Html.LabelFor(model => model.Item1.First().Order.OrderUser.Address, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-4">
+                                        @Html.TextBoxFor(model => model.Item1.FirstOrDefault().Order.OrderUser.Address, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.Item1.First().Order.OrderUser.Address, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Item2.Email, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-4">
+                                        @Html.TextBoxFor(model => model.Item2.Email, new { @class = "form-control", @disabled = "true" })
+                                        @Html.ValidationMessageFor(model => model.Item2.Email, "", new { @class = "text-danger" })
+                                    </div>
+                                    @Html.LabelFor(model => model.Item1.First().Order.OrderUser.Email, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-4">
+                                        @Html.TextBoxFor(model => model.Item1.FirstOrDefault().Order.OrderUser.Email, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.Item1.First().Order.OrderUser.Email, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.Item2.Telephone, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-4">
+                                        @Html.TextBoxFor(model => model.Item2.Telephone, new { @class = "form-control", @disabled = "true" })
+                                        @Html.ValidationMessageFor(model => model.Item2.Telephone, "", new { @class = "text-danger" })
+                                    </div>
+                                    @Html.LabelFor(model => model.Item1.First().Order.OrderUser.Telephone, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-4">
+                                        @Html.TextBoxFor(model => model.Item1.FirstOrDefault().Order.OrderUser.Telephone, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.Item1.First().Order.OrderUser.Telephone, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-offset-2 col-md-10">
+                                        <div class="checkbox">
+                                            @Html.CheckBoxFor(m => m.Item1.FirstOrDefault().Order.User.Agreement)
+                                            @Html.LabelFor(m => m.Item1.FirstOrDefault().Order.User.Agreement, "Przeczytałem regulamin oraz Wyrażam zgodę na przetwarzanie danych osobowych.")
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.Item1.FirstOrDefault().Order.User.Agreement, null, new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <input type="submit" value="Zrealizuj" class="btn btn-primary" />
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Zamknij</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <button id="x" style="display: none;" type="button" class="btn btn-primary" data-toggle="modal" data-target="#komunikat">Zrealizuj</button>
+
+</div>
+
+<link href="@Url.Content("~/Content/jquery.dataTables.min.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery.dataTables.min.js")"></script>
+
+<script>
+    //var dataTable = $("#myTable").dataTable({"order": [[1,"asc"]]});
+
+    function success() {
+        $("#test").load(location.href + "OrderProducts/IndexForAjax #test");
+        //dataTable.draw;
+    }
+
+    function successModal() {
+        var status = 1;
+        $('span').each(function () {
+            var value = $(this).text().toString();
+            console.log("value:" + value);
+            console.log(value.localeCompare("Pole jest wymagane."));
+
+            if ((value.localeCompare("Pole jest wymagane.")) == 0) {
+                status = 0;
+            }
+            else if ((value.localeCompare("Musisz zaakceptować regulamin sklepu.")) == 0)
+                status = 0;
+        });
+        if (status) {
+            $("#closeButton").click();
+            setTimeout(function () {
+                success();
+            }, 500);
+        }
+        $("#x").click();
+        setTimeout(function () {
+            $("#closeButton2").click();
+        }, 2000);
+    }
+
+    $(document).ajaxComplete(function () {
+        var table = $('#example').DataTable();
+        table.destroy();
+        $('#example').DataTable({
+            "order": [[0, "asc"]],
+            "language": {
+                "lengthMenu": "Wyświetl _MENU_ rekordów na stronę",
+                "zeroRecords": "Brak rekordów",
+                "info": "Strona _PAGE_ z _PAGES_",
+                "infoEmpty": "Rekordy są niedostępne",
+                "infoFiltered": "(przefiltrowano z _MAX_ total records)",
+                "search": "Szukaj",
+                "paginate": {
+                    "previous": "Poprzednia",
+                    "next": "Następna",
+                },
+            },
+            "sDom": "lrtip",
+        });
+    });
+
+    $(document).ready(function () {
+        $('#example').DataTable({
+            "order": [[0, "asc"]],
+            "language": {
+                "lengthMenu": "Wyświetl _MENU_ rekordów na stronę",
+                "zeroRecords": "Brak rekordów",
+                "info": "Strona _PAGE_ z _PAGES_",
+                "infoEmpty": "Rekordy są niedostępne",
+                "infoFiltered": "(przefiltrowano z _MAX_ total records)",
+                "search": "Szukaj",
+                "paginate": {
+                    "previous": "Poprzednia",
+                    "next": "Następna",
+                },
+            },
+            "sDom": "lrtip",
+        });
+    });
+    $(window).unload(function () {
+        console.log("help");
+        table.destroy();
+        console.log(table);
+    });
+</script>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<div id="komunikat" class="modal fade bs-example-modal-sm" role="dialog" aria-labelledby="myLargeModalLabel" tabindex="-1">
+    <div class="modal-dialog modal-sm " style="width: 400px;">
+
+        <!-- Modal content-->
+        <div class="modal-content modal-window">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" id="closeButton">&times;</button>
+                <h4 class="modal-title">Komunikat</h4>
+            </div>
+            <div id="formularz">
+                <div class="modal-body">
+                    Zamówienie zostało pomyślnie zrealizowanie.
+                </div>
+                <div class="modal-footer">
+                    <button id="closeButton2" type="button" class="btn btn-primary" data-dismiss="modal">Zamknij</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

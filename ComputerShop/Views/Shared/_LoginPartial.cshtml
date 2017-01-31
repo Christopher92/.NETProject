@@ -1,0 +1,33 @@
+﻿@using Microsoft.AspNet.Identity
+@if (Request.IsAuthenticated)
+{
+    @ViewBag.User
+
+    //using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+    //{
+    @*@Html.AntiForgeryToken()*@
+if (this.User.IsInRole("Administrator") || this.User.IsInRole("Sprzedawca"))
+{
+    <li>@Html.ActionLink("Admin", "Index", "Admin", null, new { @class = "text" })</li>
+}
+if (this.User.IsInRole("Klient"))
+{
+    <li>@Ajax.ActionLink("Historia", "Index", "OrderProductHistories", null, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "Main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })</li>
+    }
+    <li>@Ajax.ActionLink(User.Identity.GetUserName(), "Index", "Manage", null, new AjaxOptions { HttpMethod = "GET", UpdateTargetId = "Main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })</li>
+    <li>@Ajax.ActionLink("Wyloguj", "LogOff", "Account", null, new AjaxOptions { HttpMethod = "POST", OnSuccess = "reload()" }, new { @class = "text" })</li>
+
+    @*<li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>*@
+    //}
+}
+else
+{
+    <li>@Ajax.ActionLink("Rejestracja", "Register", "Account", null, new AjaxOptions { HttpMethod = "GET", UpdateTargetId = "Main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })</li>
+    <li>@Ajax.ActionLink("Logowanie", "GetLogin", "Account", null, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "Main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })</li>
+}
+
+<script>
+    function reload() {
+        window.location.reload(true);
+    }
+</script>

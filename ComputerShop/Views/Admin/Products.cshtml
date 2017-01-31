@@ -1,0 +1,257 @@
+﻿@model IEnumerable<ComputerShop.Models.Product>
+<div id="test">
+    @{
+        ViewBag.Title = "Produkty";
+    }
+
+    <h2>@ViewBag.Title</h2>
+    <hr />
+@if (this.User.IsInRole("Administrator"))
+{ 
+    <p>
+        @{var add = "<span class=' glyphicon glyphicon-plus'></span>"; }
+        <a class="btn btn-success" data-ajax="true" data-ajax-method="GET" data-ajax-mode="replace" data-ajax-update="#main" href="/Products/Create">@Html.Raw(add)</a>
+    </p>
+}
+    <table id="example" class="stripe">
+        <thead>
+            <tr>
+                <th>
+                    Lp.
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    Nazwa kategorii
+                </th>
+                @*<th>
+                        @Html.DisplayNameFor(model => model.ProductPictureID)
+                    </th>*@
+                <th>
+                    @Html.DisplayNameFor(model => model.Price)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Description)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Quantity)
+                </th>
+                <th>
+                    Dostępność
+                </th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        @{ int i = 1;}
+        <tbody>
+            @foreach (var item in Model)
+            {
+                var activate = "";
+                var button = "";
+                var text = "";
+
+                if (item.Enable == true)
+                {
+                    activate = "Dezaktywuj";
+                    button = "btn-danger";
+                    text = "Tak";
+                }
+                else
+                {
+                    activate = "Aktywuj";
+                    button = "btn-success";
+                    text = "Nie";
+                }
+                <tr>
+                    <td>
+                        @i
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Category.Name)
+                    </td>
+                    @*<td>
+                            @Html.DisplayFor(modelItem => item.ProductPictureID)
+                        </td>*@
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Quantity)
+                    </td>
+                    <td>
+                        @text
+                    </td>
+                    <td>
+                        @{var edit = "<span class=' glyphicon glyphicon-edit'></span>";
+                            var hdd = "<span class=' glyphicon glyphicon-hdd'></span>";
+                            var switchbutton = "";
+                            var btncolor = "";
+
+                            if (@activate == "Dezaktywuj")
+                            {
+                                switchbutton = "<span class=' glyphicon glyphicon-off'></span>";
+                                btncolor = "btn-danger";
+                            }
+                            else if (@activate == "Aktywuj")
+                            {
+                                switchbutton = "<span class=' glyphicon glyphicon-off'></span>";
+                                btncolor = "btn-success";
+                            }
+                        }
+
+                        @if (this.User.IsInRole("Administrator"))
+                        {
+                            <a class="btn btn-success" data-ajax="true" data-ajax-method="GET" data-ajax-mode="replace" data-ajax-update="#main" href="/Products/Edit/@item.ProductID">@Html.Raw(edit)</a>
+                            @*@Ajax.ActionLink("Edytuj", "Edit", "Products", new { id = item.ProductID }, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "main" }, new { @class = "btn btn-success" })*@
+                            <a class="btn @btncolor" data-ajax="true" data-ajax-method="GET" data-ajax-success="success()" href="/Products/Activate/@item.ProductID">@Html.Raw(switchbutton)</a>
+                            @*@Ajax.ActionLink(@activate, "Activate", "Products", new { id = item.ProductID }, new AjaxOptions { HttpMethod = "GET", OnSuccess = "success()" }, new { @class = "btn " + @button })*@
+                        }
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#@Html.DisplayFor(modelItem => item.ProductID).ToString()">@Html.Raw(hdd)</button>
+
+
+
+
+                        <div id="@Html.DisplayFor(modelItem => item.ProductID).ToString()" class="modal fade" role="dialog" aria-labelledby="myLargeModalLabel" tabindex="-1">
+                            <div class="modal-dialog modal-sm">
+
+                                <!-- Modal content-->
+                                <div class="modal-content modal-window">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" id="closeButton">&times;</button>
+                                        <h4 class="modal-title">Uzupełnianie stanu magazynowego</h4>
+                                    </div>
+                                    @using (@Ajax.BeginForm("AddProducts", "Products", new { productId = item.ProductID }, new AjaxOptions { HttpMethod = "POST", OnSuccess = "successModal('" + @Html.DisplayFor(modelItem => item.ProductID).ToString() + "')" }))
+                                    {
+                                        int quantity = 0;
+                                        <div class="modal-body">
+                                            @Html.LabelFor(x => quantity, "Ilość produktów", htmlAttributes: new { @class = "control-label col-md-2" })
+                                            @Html.TextBoxFor(x => quantity, new { type = "number", min = "1", max = "1000", value = "1", @class = "form-control" })
+                                        </div>
+                                        <div class="modal-footer">
+                                            <input type="submit" value="Dodaj" class="btn btn-primary" />
+                                            @*<button type="button" class="btn btn-primary" id="saveButton" onclick="clickFunction(@Html.DisplayFor(modelItem => item.ProductID).ToString())">Zapisz</button>*@
+                                            <button id="@Html.DisplayFor(modelItem => item.ProductID).ToString().Insert(0,"Button")" type="button" class="btn btn-primary" data-dismiss="modal">Zamknij</button>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                                i++;
+                            }
+        </tbody>
+    </table>
+</div>
+
+<link href="@Url.Content("~/Content/jquery.dataTables.min.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery.dataTables.min.js")"></script>
+
+<script>
+    function success() {
+        $("#test").load(location.href + "/GetProducts #test");
+        //$("#myModal").modal("show");
+    }
+
+    function successModal(modal) {
+        //console.log(modal);
+        //var modal = document.getElementById(this.modal);
+
+        $("#Button" + modal).click();
+        setTimeout(function () {
+            success();
+        }, 500);
+        //$("#test").load(location.href + "/GetProducts #test");
+    }
+
+    $(document).ajaxComplete(function () {
+        var table = $('#example').DataTable();
+        table.destroy();
+        $('#example').DataTable({
+            "order": [[0, "asc"]],
+            "language": {
+                "lengthMenu": "Wyświetl _MENU_ rekordów na stronę",
+                "zeroRecords": "Brak rekordów",
+                "info": "Strona _PAGE_ z _PAGES_",
+                "infoEmpty": "Rekordy są niedostępne",
+                "infoFiltered": "(przefiltrowano z _MAX_ total records)",
+                "search": "Szukaj",
+                "paginate": {
+                    "previous": "Poprzednia",
+                    "next": "Następna",
+                },
+            },
+            "columnDefs": [
+            {
+                "targets": [4],
+                "visible": false
+            }
+            ],
+//            "columns": [
+//{ "width": "2%" },
+//{ "width": "20%" },
+//{ "width": "20%" },
+//{ "width": "10%" },
+//null,
+//{ "width": "10%" },
+//{ "width": "10%" },
+//{ "width": "10%" },
+
+
+//            ],
+        });
+    });
+
+    $(document).ready(function () {
+        $('#example').DataTable({
+            "order": [[0, "asc"]],
+            "language": {
+                "lengthMenu": "Wyświetl _MENU_ rekordów na stronę",
+                "zeroRecords": "Brak rekordów",
+                "info": "Strona _PAGE_ z _PAGES_",
+                "infoEmpty": "Rekordy są niedostępne",
+                "infoFiltered": "(przefiltrowano z _MAX_ total records)",
+                "search": "Szukaj",
+                "paginate": {
+                    "previous": "Poprzednia",
+                    "next": "Następna",
+                },
+            },
+            "columnDefs": [
+{
+    "targets": [4],
+    "visible": false
+}
+            ],
+//            "columns": [
+//{ "width": "2%" },
+//{ "width": "20%" },
+//{ "width": "20%" },
+//{ "width": "10%" },
+//null,
+//{ "width": "10%" },
+//{ "width": "10%" },
+//{ "width": "10%" },
+
+
+//            ],
+        });
+    });
+
+    //$(window).unload(function () {
+    //    console.log("help");
+    //    table.destroy();
+    //    console.log(table);
+    //});
+
+</script>
+@Scripts.Render("~/bundles/bootstrap")
+@Scripts.Render("~/bundles/jqueryval")
+

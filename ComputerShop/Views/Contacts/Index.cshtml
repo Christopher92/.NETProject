@@ -1,0 +1,76 @@
+﻿@model IEnumerable<ComputerShop.Models.Contact>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Telephone)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Address)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AccountNumber)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Email)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.WeekOpenTime)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.SaturdayOpenTime)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.SundayOpenTime)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.GoogleMapUrl)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Telephone)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Address)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.AccountNumber)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Email)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.WeekOpenTime)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.SaturdayOpenTime)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.SundayOpenTime)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.GoogleMapUrl)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.ContactID }) |
+            @Html.ActionLink("Details", "Details", new { id=item.ContactID }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.ContactID })
+        </td>
+    </tr>
+}
+
+</table>
+

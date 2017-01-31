@@ -1,0 +1,313 @@
+﻿@model IEnumerable<ComputerShop.Models.Raport>
+@using Microsoft.AspNet.Identity
+
+@{
+    ViewBag.Title = "Administracja";
+    Layout = null;
+}
+<!-- Page Heading -->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Sklep komputerowy</title>
+    @Styles.Render("~/Content/bootstrap")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/metisMenu")
+    @Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.min.js")
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link href="@Url.Content("~/Content/sb-admin.css")" rel="stylesheet" type="text/css" />
+    @*<link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />*@
+    <link href="@Url.Content("~/Content/jquery.dataTables.min.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/jquery.dataTables.min.js")"></script>
+</head>
+<body>
+    <div id="wrapper">
+        <!-- Navigation -->
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Administracja", "Index", "Admin", null, new { @class = "navbar-brand" })
+                @Html.ActionLink("Strona główna", "Index", "Home", null, new { @class = "navbar-brand" })
+            </div>
+            <!-- Top Menu Items -->
+            <ul class="nav navbar-right top-nav">
+                <li>
+                    <a href=""><i class="fa fa-user"></i> @this.User.Identity.Name</a>
+
+                </li>
+            </ul>
+            <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav side-nav">
+                    @if (this.User.IsInRole("Administrator"))
+                    {
+                        <li>@Ajax.ActionLink("Zamówienia", "IndexForAjax", "Admin", null, new AjaxOptions { HttpMethod = "GET", UpdateTargetId = "main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })</li>
+                        <li>@Ajax.ActionLink("Użytkownicy", "GetUsers", "Admin", null, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })</li>
+                        <li>@Ajax.ActionLink("Kategorie", "GetCategories", "Admin", null, new AjaxOptions { HttpMethod = "GET", UpdateTargetId = "main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })</li>
+                        <li>@Ajax.ActionLink("Produkty", "GetProducts", "Admin", null, new AjaxOptions { HttpMethod = "GET", UpdateTargetId = "main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })</li>
+                        @*<li>@Ajax.ActionLink("Raporty", "Index", "Admin", null, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })</li>*@
+                        <li>@Ajax.ActionLink("Regulamin", "Edit", "Regulations", null, new AjaxOptions { HttpMethod = "GET", InsertionMode = InsertionMode.Replace, UpdateTargetId = "main" }, new { @class = "text" })</li>
+                        <li>@Ajax.ActionLink("Kontakt", "GetContact", "Admin", null, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })</li>
+                        <li>@Ajax.ActionLink("Typ dostawy", "GetOrderSupplies", "Admin", null, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })</li>
+                        <li>@Ajax.ActionLink("Typ zapłaty", "GetOrderPayments", "Admin", null, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })</li>
+                    }
+                    @if (this.User.IsInRole("Sprzedawca"))
+                    {
+                        <li>@Ajax.ActionLink("Zamówienia", "IndexForAjax", "Admin", null, new AjaxOptions { HttpMethod = "GET", UpdateTargetId = "main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })</li>
+                        <li>@Ajax.ActionLink("Użytkownicy", "GetUsers", "Admin", null, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })</li>
+                        <li>@Ajax.ActionLink("Kategorie", "GetCategories", "Admin", null, new AjaxOptions { HttpMethod = "GET", UpdateTargetId = "main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })</li>
+                        <li>@Ajax.ActionLink("Produkty", "GetProducts", "Admin", null, new AjaxOptions { HttpMethod = "GET", UpdateTargetId = "main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })</li>
+                    }
+                </ul>
+            </div>
+        </nav>
+        <div id="page-wrapper">
+            <div class="container-fluid" id="container">
+                <div id="main">
+                    <h2>@ViewBag.Title</h2>
+                    <hr />
+                    <div class="row">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="panel panel-yellow">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                            <i class="fa fa-shopping-cart fa-5x"></i>
+                                        </div>
+                                        <div class="col-xs-9 text-right">
+                                            <div class="huge">@Html.DisplayFor(modelItem => Model.FirstOrDefault().OrdersQuantity)</div>
+                                            <div>Nowe zamówienia!</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel-footer">
+                                    <span class="pull-left">
+                                        @Ajax.ActionLink("Szczegóły", "IndexForAjax", "Admin", null, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })
+                                    </span>
+                                    <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="panel panel-green">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                            <i class="fa fa-tasks fa-5x"></i>
+                                        </div>
+                                        <div class="col-xs-9 text-right">
+                                            <div class="huge">@Html.DisplayFor(modelItem => Model.FirstOrDefault().DailyRevenue) zł</div>
+                                            <div>Całkowita sprzedaż!</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="#">
+                                    <div class="panel-footer">
+                                        <span class="pull-left">
+                                            @Ajax.ActionLink("Szczegóły", "IndexForAjax", "Admin", null, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })
+                                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                            <div class="clearfix"></div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                            <i class="fa fa-comments fa-5x"></i>
+                                        </div>
+                                        <div class="col-xs-9 text-right">
+                                            <div class="huge">@Html.DisplayFor(modelItem => Model.FirstOrDefault().Realised)</div>
+                                            <div>Zrealizowane zamówienia</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="#">
+                                    <div class="panel-footer">
+                                        <span class="pull-left">
+                                            @Ajax.ActionLink("Szczegóły", "IndexForAjax", "Admin", null, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })
+                                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                            <div class="clearfix"></div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="panel panel-red">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                            <i class="fa fa-support fa-5x"></i>
+                                        </div>
+                                        <div class="col-xs-9 text-right">
+
+                                            @{double x = 0;
+                                                if (Model.FirstOrDefault() != null)
+                                                {
+                                                    x = Model.FirstOrDefault().OrdersQuantity - Model.FirstOrDefault().Realised;
+                                                }
+                                            }
+                                            <div class="huge">@x</div>
+                                            <div>Niezrealizowane zamówienia</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="#">
+                                    <div class="panel-footer">
+                                        <span class="pull-left">
+                                            @Ajax.ActionLink("Szczegóły", "IndexForAjax", "Admin", null, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "main", InsertionMode = InsertionMode.Replace }, new { @class = "text" })
+                                            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                            <div class="clearfix"></div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.row -->
+
+                    <table id="example" class="stripe">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Data
+                                </th>
+                                <th>
+                                    Liczba zamówień
+                                </th>
+                                <th>
+                                    Liczba produktów
+                                </th>
+                                <th>
+                                    Sprzedaż
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Date)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.OrdersQuantity)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ProductsQuantity)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.DailyRevenue) zł
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+</html>
+
+<link href="@Url.Content("~/Content/jquery.dataTables.min.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery.dataTables.min.js")"></script>
+
+<script>
+    function success() {
+        $("#test").load(location.href + " #test");
+        //dataTable.draw;
+
+    }
+
+    function successModal() {
+        $("#test").load(location.href + "OrderProducts/IndexForAjax #test");
+        $("#closeButton").click();
+
+    }
+
+    $(document).ajaxComplete(function () {
+        NProgress.done();
+
+        var table = $('#example').DataTable();
+        table.destroy();
+        $('#example').DataTable({
+            "order": [[0, "asc"]],
+            "language": {
+                "lengthMenu": "Wyświetl _MENU_ rekordów na stronę",
+                "zeroRecords": "Brak rekordów",
+                "info": "Strona _PAGE_ z _PAGES_",
+                "infoEmpty": "Rekordy są niedostępne",
+                "infoFiltered": "(przefiltrowano z _MAX_ total records)",
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        $('#example').DataTable({
+            "order": [[0, "asc"]],
+            "language": {
+                "lengthMenu": "Wyświetl _MENU_ rekordów na stronę",
+                "zeroRecords": "Brak rekordów",
+                "info": "Strona _PAGE_ z _PAGES_",
+                "infoEmpty": "Rekordy są niedostępne",
+                "infoFiltered": "(przefiltrowano z _MAX_ total records)",
+            }
+        });
+    });
+    $(window).unload(function () {
+        console.log("help");
+        table.destroy();
+        console.log(table);
+    });
+</script>
+
+@*@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/bootstrap")
+
+
+}*@
+
+<script>
+    $(document).ready(function () {
+        NProgress.start();
+    });
+
+    $(window).load(function () {
+        NProgress.done();
+    });
+    $(window).ajaxStart(function () {
+        NProgress.start();
+    });
+
+    $(window).ajaxComplete(function () {
+        NProgress.done();
+    });
+</script>
+
+<script src="@Url.Content("~/Scripts/nprogress.js")"></script>
+<link href="@Url.Content("~/Content/nprogress.css")" rel="stylesheet" type="text/css" />

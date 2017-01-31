@@ -1,0 +1,98 @@
+﻿@model ComputerShop.Models.Product
+<div id="test">
+    @{
+        ViewBag.Title = "RetrieveProduct";
+    }
+
+    <h2 class="page-header">@Html.DisplayFor(model => model.Name)</h2>
+
+    <div class="row">
+        <div class="col-md-8">
+            <img class="img-responsive" src=@Html.DisplayFor(model => model.ProductPicture.Path) alt="" @*width="500" height="300"*@>
+        </div>
+        <div class="col-md-4">
+            <h3>Opis produktu</h3>
+            <p>@Html.DisplayFor(model => model.Description)</p>
+            <h4>@Html.DisplayNameFor(model => model.Price): @Html.DisplayFor(model => model.Price) zł</h4>
+            <h4>Stan magazynowy: @Html.DisplayFor(model => model.Quantity) szt</h4>
+            @if (this.User.IsInRole("Klient"))
+            {
+                if (Model.Quantity != 0)
+                {
+                        <div class="input-group pull-left col-md-12">
+                            <input type="number" placeholder="Ilość produktów"  min="1" class="form-control" id="quantity" style="max-width: 320px">
+                            <span class="input-group-btn">
+                                @{var text = "<span class=' glyphicon glyphicon-shopping-cart'></span>"; }
+                                <a data-ajax="true" class="btn btn-primary" role="button" data-ajax-success="SuccessMessage(@Html.DisplayFor(model => model.ProductID),@Html.DisplayFor(model => model.Quantity))" href="/OrderProducts/AddOneProductToCart/@Html.DisplayFor(model => model.ProductID)/">
+                                    @Html.Raw(text)
+                                </a>
+                            </span>
+                        </div>
+                    <br>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-12" id=@Html.DisplayFor(model => model.ProductID)></div>
+                                </div>
+                                    }
+                                }
+            <center>
+                <font color="green">
+                    <label></label>
+                </font>
+            </center>
+        </div>
+
+    </div>
+    <br>
+</div>
+@*<ul class="nav nav-tabs" role="tablist" id="myTabs">
+        <li role="presentation" class="active"><a href="#a" aria-controls="a" role="tab" data-toggle="tab">Specyfikacja techniczna</a></li>
+        <li role="presentation"><a href="#b" aria-controls="b" role="tab" data-toggle="tab">Komentarze</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane fade in active" id="a">
+        </div>
+        <div role="tabpanel" class="tab-pane fade" id="b">
+        </div>
+    </div>*@
+
+<script>
+    $('#myTabs').click(function (e) {
+        e.preventDefault()
+        $(this).tab('show')
+    })
+
+    function SuccessMessage(number, quantity) {
+        var qValue = $("#quantity").val();
+        if (qValue > 0) {
+            if (quantity < qValue)
+                qValue = quantity;
+            $.ajax({
+                url: '/OrderProducts/AddOneProductToCart/',
+                data: { id: number, quantity: qValue - 1 },
+            }).done(function () {
+                //alert('Added');
+            });
+            $('#' + number).html("<center><b><font color='green' size='4'>Dodano " + qValue + " szt. produktu do koszyka.</font></b></center>")
+                .show()
+                .delay(2000).fadeOut();
+            setTimeout(function () {
+                $("#test").load(location.href + "Products/RetrieveProduct/" + number + " #test");
+            }, 2500);
+        }
+        else if(qValue == ""){
+            $('#' + number).html("<center><b><font color='red' size='4'>Należy podać ilość produktów.</font></b></center>")
+                .show()
+                .delay(2000).fadeOut();
+
+        }
+        else {
+            $('#' + number).html("<center><b><font color='red' size='4'>Liczba produktów nie może być ujemna.</font></b></center>")
+                .show()
+                .delay(2000).fadeOut();
+
+        }
+    }
+
+</script>

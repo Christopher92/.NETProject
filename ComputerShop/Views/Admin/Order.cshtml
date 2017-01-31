@@ -1,0 +1,161 @@
+﻿@model IEnumerable<ComputerShop.Models.Order>
+<div id="test">
+    @{
+        ViewBag.Title = "Zamówienia";
+    }
+
+    <h2>@ViewBag.Title</h2>
+    <hr />
+
+    <table id="example" class="stripe">
+        <thead>
+            <tr>
+                <th>
+                    Lp.
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.OrderPayment.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.OrderState.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.OrderSupply.Name)
+                </th>
+                <th>
+                    Klient
+                </th>
+                <th>
+                    Suma
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.IncomingDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.OutcomingDate)
+                </th>
+                @if (this.User.IsInRole("Sprzedawca"))
+                {
+                    <th>Akcje</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @{ int i = 1;}
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @i
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OrderPayment.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OrderState.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OrderSupply.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.User.Email)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Suma) zł
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IncomingDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.OutcomingDate)
+                    </td>
+                    @if (this.User.IsInRole("Sprzedawca"))
+                    {
+                        <td>
+                            @{var add = "<span class=' glyphicon glyphicon-ok'></span>"; }
+                            @{var delete = "<span class=' glyphicon glyphicon-remove'></span>"; }
+                            @{var details = "<span class=' glyphicon glyphicon-list-alt'></span>"; }
+
+                            <a data-ajax="true" class="btn btn-primary" role="button" data-ajax-success="success()" href="/Admin/Realize/@item.OrderID">@Html.Raw(add)</a>
+                            @*@Ajax.ActionLink("O", "GetOrderProducts", "Admin", new { id = @item.OrderID }, new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "main", InsertionMode = InsertionMode.Replace }, new { @class = "btn btn-success" })*@
+                            <a class="btn btn-success" data-ajax="true" data-ajax-method="POST" data-ajax-mode="replace" data-ajax-update="#main" href="/Admin/GetOrderProducts/@item.OrderID">@Html.Raw(details)</a>
+                            <a data-ajax="true" class="btn btn-danger" role="button" data-ajax-success="success" href="/Admin/Reject/@item.OrderID">@Html.Raw(delete)</a>
+                        </td>
+
+                        }
+                    </tr>
+                i++;
+            }
+        </tbody>
+
+    </table>
+</div>
+<link href="@Url.Content("~/Content/jquery.dataTables.min.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery.dataTables.min.js")"></script>
+
+<script>
+    //var dataTable = $("#myTable").dataTable({"order": [[1,"asc"]]});
+
+    function success() {
+        $("#test").load(location.href + "/IndexForAjax #test");
+        //dataTable.draw;
+
+    }
+
+    function successModal() {
+        $("#test").load(location.href + "Admin/IndexForAjax #test");
+        $("#closeButton").click();
+
+    }
+
+    $(document).ajaxComplete(function () {
+        var table = $('#example').DataTable();
+        table.destroy();
+        $('#example').DataTable({
+            "order": [[0, "asc"]],
+            "language": {
+                "lengthMenu": "Wyświetl _MENU_ rekordów na stronę",
+                "zeroRecords": "Brak rekordów",
+                "info": "Strona _PAGE_ z _PAGES_",
+                "infoEmpty": "Rekordy są niedostępne",
+                "infoFiltered": "(przefiltrowano z _MAX_ total records)",
+                "search": "Szukaj",
+                "paginate": {
+                    "previous": "Poprzednia",
+                    "next": "Następna",
+                },
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        var table = $('#example').DataTable();
+        table.destroy();
+
+        $('#example').DataTable({
+            "order": [[0, "asc"]],
+            "language": {
+                "lengthMenu": "Wyświetl _MENU_ rekordów na stronę",
+                "zeroRecords": "Brak rekordów",
+                "info": "Strona _PAGE_ z _PAGES_",
+                "infoEmpty": "Rekordy są niedostępne",
+                "infoFiltered": "(przefiltrowano z _MAX_ total records)",
+                "search": "Szukaj",
+                "paginate": {
+                    "previous": "Poprzednia",
+                    "next": "Następna",
+                },
+            }
+        });
+    });
+    $(window).unload(function () {
+        console.log("help");
+        table.destroy();
+        console.log(table);
+    });
+</script>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+

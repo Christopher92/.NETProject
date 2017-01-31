@@ -1,0 +1,144 @@
+﻿@model IEnumerable<ComputerShop.Models.ApplicationUser>
+
+@{
+    ViewBag.Title = "Użytkownicy";
+}
+
+<h2>@ViewBag.Title</h2>
+<hr />
+<table id="example" class="stripe">
+    <thead>
+        <tr>
+            <th>
+                Lp.
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                Typ konta
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Surname)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Address)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Telephone)
+            </th>
+        </tr>
+    </thead>
+    @{ int i = 1;}
+    <tbody>
+        @foreach (var item in Model)
+            {
+            <tr>
+                <td>
+                    @i
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @{string Role = "";
+                        if (item.Roles.First().RoleId == "1")
+                        {
+                            Role = "Administrator";
+                        }
+                        else if (item.Roles.First().RoleId == "2")
+                        {
+                            Role = "Klient";
+                        }
+                        else if (item.Roles.First().RoleId == "3")
+                        {
+                            Role = "Sprzedawca";
+                        }
+                    }
+                    @Role
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Surname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Address)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Telephone)
+                </td>
+            </tr>
+                            i++;
+                        }
+    </tbody>
+</table>
+
+<link href="@Url.Content("~/Content/jquery.dataTables.min.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/jquery.dataTables.min.js")"></script>
+
+<script>
+    //var dataTable = $("#myTable").dataTable({"order": [[1,"asc"]]});
+
+    function success() {
+        $("#last").load("http://localhost:6427/Admin/GetArticles" + " #last");
+        //dataTable.draw;
+
+    }
+
+    function successModal() {
+        $("#test").load(location.href + "OrderProducts/IndexForAjax #test");
+        $("#closeButton").click();
+    }
+
+    $(document).ajaxComplete(function () {
+        var table = $('#example').DataTable();
+        table.destroy();
+        $('#example').DataTable({
+            "order": [[0, "asc"]],
+            "language": {
+                "lengthMenu": "Wyświetl _MENU_ rekordów na stronę",
+                "zeroRecords": "Brak rekordów",
+                "info": "Strona _PAGE_ z _PAGES_",
+                "infoEmpty": "Rekordy są niedostępne",
+                "infoFiltered": "(przefiltrowano z _MAX_ total records)",
+                "search": "Szukaj",
+                "paginate": {
+                    "previous": "Poprzednia",
+                    "next": "Następna",
+                },
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        $('#example').DataTable({
+            "order": [[0, "asc"]],
+            "language": {
+                "lengthMenu": "Wyświetl _MENU_ rekordów na stronę",
+                "zeroRecords": "Brak rekordów",
+                "info": "Strona _PAGE_ z _PAGES_",
+                "infoEmpty": "Rekordy są niedostępne",
+                "infoFiltered": "(przefiltrowano z _MAX_ total records)",
+                "search": "Szukaj",
+                "paginate": {
+                    "previous": "Poprzednia",
+                    "next": "Następna",
+                },
+            }
+        });
+    });
+    $(window).unload(function () {
+        console.log("help");
+        table.destroy();
+        console.log(table);
+    });
+</script>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

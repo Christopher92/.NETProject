@@ -1,0 +1,73 @@
+﻿@model ComputerShop.Models.Contact
+
+@{
+    ViewBag.Title = "Contact";
+}
+
+
+<div class="row">
+    <div class="page-header">
+        <h1 class="col-lg-12">
+            Kontakt
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="content">
+        <div class="col-lg-12">
+            <div class="row">
+                <b>
+                    <div class="col-md-4">@Html.DisplayNameFor(x => Model.Telephone): </div>
+                </b>
+                <div class="col-md-8">@Html.DisplayFor(x => Model.Telephone)</div>
+            </div>
+            <div class="row">
+                <b>
+                    <div class="col-md-4">@Html.DisplayNameFor(x => Model.Address): </div>
+                </b>
+                <div class="col-md-8">@Html.DisplayFor(x => Model.Address)</div>
+            </div>
+            <div class="row">
+                <b>
+                    <div class="col-md-4">@Html.DisplayNameFor(x => Model.AccountNumber): </div>
+                </b>
+                <div class="col-md-8">@Html.DisplayFor(x => Model.AccountNumber)</div>
+            </div>
+            <div class="row">
+                <b>
+                    <div class="col-md-4">@Html.DisplayNameFor(x => Model.Email): </div>
+                </b>
+                <div class="col-md-8">@Html.DisplayFor(x => Model.Email)</div>
+            </div>
+            <br>
+            Godziny pracy sklepu stacjonarnego:
+            <div class="row">
+                <b>
+                    <div class="col-md-4">@Html.DisplayNameFor(x => Model.WeekOpenTime): </div>
+                </b>
+                <div class="col-md-8">@Html.DisplayFor(x => Model.WeekOpenTime)</div>
+            </div>
+            <div class="row">
+                <b>
+                    <div class="col-md-4">@Html.DisplayNameFor(x => Model.SaturdayOpenTime): </div>
+                </b>
+                <div class="col-md-8">@Html.DisplayFor(x => Model.SaturdayOpenTime)</div>
+            </div>
+            <div class="row">
+                <b><div class="col-md-4 control-label">@Html.DisplayNameFor(x => Model.SundayOpenTime): </div></b>
+                <div class="col-md-8">@Html.DisplayFor(x => Model.SundayOpenTime)</div>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+<a href="javascript:;" id="x">Mapa dojazdu</a>
+<div hidden id="frame"><iframe  hide src=@Html.DisplayFor(x => Model.GoogleMapUrl) width="1140" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
+</div>
+<script>
+
+$("#x").click(function(){
+    $("#frame").toggle();
+});
+</script>

@@ -1,0 +1,80 @@
+﻿@model PagedList.IPagedList<ComputerShop.Models.Product>
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+@{
+    ViewBag.Title = "List";
+    Layout = null;
+}
+
+@*<h2>List</h2>*@
+<div id="x">
+    @foreach (var product in Model)
+    {
+        <div class="thumbnail row thumbnail-update">
+            <div class="col-md-5">
+                <img data-src="holder.js/100%x200" alt="100%x200" style="height: 200px; width: 100%; " src=@Html.DisplayFor(model => product.ProductPicture.Path) data-holder-rendered="true">
+            </div>
+            <div class="caption col-md-7">
+                <h3 id="thumbnail-label">
+                    @*@product.Name<a class="anchorjs-link" href="#thumbnail-label"><span class="anchorjs-icon"></span></a>*@
+                    @Ajax.ActionLink(@Html.DisplayFor(x => product.Name).ToString(), "RetrieveProduct", "Products", new { id = product.ProductID }, new AjaxOptions { HttpMethod = "GET", UpdateTargetId = "Main", InsertionMode = InsertionMode.Replace })
+                </h3>
+                <p>@Html.DisplayFor(model => product.Description)</p>
+
+                <div class="col-md-12 text-left">
+                    <h2>@Html.DisplayFor(x => product.Price) zł</h2>
+                </div>
+                <div class="col-md-12 text-left">
+                    @{
+                        var aval = "";
+                        if (product.Quantity > 0)
+                        {
+                            aval = "Tak";
+                        }
+                        else
+                        {
+                            aval = "Nie";
+                        }
+                    }
+                    <h4>Dostępność: @aval</h4>
+                </div>
+                @if (this.User.IsInRole("Klient"))
+                {
+                    if (@aval != "Nie")
+                    {
+                        <div class="row">
+                            <div class="col-md-5">
+                                @{var text = "Dodaj do koszyka"; }
+                                <a data-ajax="true" class="btn btn-primary" role="button" data-ajax-success="SuccessMessage(@product.ProductID)" href="/OrderProducts/AddOneProductToCart/@product.ProductID">
+                                    @Html.Raw(text)
+                                </a>
+                            </div>
+                            <div class="col-md-7" id=@product.ProductID></div>
+                        </div>
+                                        }
+                                    }
+            </div>
+        </div>
+        <br>
+                                    }
+    Strona @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) z @Model.PageCount
+
+    @Html.PagedListPager(Model, page => Url.Action("List", new { page }), PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "POST", UpdateTargetId = "x", InsertionMode = InsertionMode.Replace }))
+
+
+</div>
+
+<script>
+    function SuccessMessage(number) {
+        if (user === "") {
+            $('#' + number).html("<b><font color='red' size='4'>Zaloguj się aby dodać</font></b>")
+            .show()
+            .delay(2000).fadeOut();
+        }
+        else {
+            $('#' + number).html("<b><font color='green' size='4'>Dodano</font></b>")
+                .show()
+                .delay(2000).fadeOut();
+        }
+    }
+</script>
